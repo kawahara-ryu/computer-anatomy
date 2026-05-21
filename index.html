@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>体験型：コンピュータ解体新書</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- タイトル -->
+        <div id="screen-title" class="screen active">
+            <div class="mech-border"><img src="./computer_anatomy.png" alt="解体新書"></div>
+            <h1 class="mech-title">COMPUTER ANATOMY</h1>
+            <h2>コンピュータ解体新書</h2>
+            <p class="subtitle">五大装置を組み立てろ！</p>
+            <button class="m-btn" onclick="startGame()">⚙️ 整備を始める</button>
+        </div>
+
+        <!-- STAGE 1: 五大装置の分類 -->
+        <div id="screen-stage1" class="screen">
+            <h2>⚙️ 工程1: パーツを仕分けろ！</h2>
+            <p class="stage-desc">各パーツが五大装置のどれに当たるか、タップして正しい装置に分類しよう！</p>
+            <div class="sort-target" id="sort-target">
+                <span class="sort-label">分類するパーツ:</span>
+                <span class="sort-item" id="sort-item-name">キーボード</span>
+            </div>
+            <div class="sort-buttons">
+                <button class="sort-btn" onclick="sortAnswer('入力')">📥 入力装置</button>
+                <button class="sort-btn" onclick="sortAnswer('出力')">📤 出力装置</button>
+                <button class="sort-btn" onclick="sortAnswer('記憶')">💾 記憶装置</button>
+                <button class="sort-btn" onclick="sortAnswer('演算')">🧮 演算装置</button>
+                <button class="sort-btn" onclick="sortAnswer('制御')">🎛️ 制御装置</button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="s1-progress"></div>
+            </div>
+            <p class="progress-label" id="s1-label">0 / 8 分類完了</p>
+            <div class="sorted-area" id="sorted-area"></div>
+        </div>
+
+        <!-- STAGE 2: データの流れ -->
+        <div id="screen-stage2" class="screen">
+            <h2>⚙️ 工程2: データの流れを追え！</h2>
+            <p class="stage-desc">「1+2を計算して画面に表示する」までの流れを、正しい順番に並べよう！</p>
+            <div class="flow-container" id="flow-container">
+                <!-- JSで動的に生成 -->
+            </div>
+            <div class="flow-result" id="flow-result">
+                <p class="flow-label">現在の順番:</p>
+                <div id="flow-display"></div>
+            </div>
+            <button class="m-btn" onclick="checkStage2()">⚙️ この順番で実行！</button>
+        </div>
+
+        <!-- STAGE 3: メモリの階層 -->
+        <div id="screen-stage3" class="screen">
+            <h2>⚙️ 工程3: メモリの速度を体感！</h2>
+            <p class="stage-desc">スライダーで「どの記憶装置からデータを取り出すか」を変えて、速度と容量の関係を体感しよう！</p>
+            <div class="memory-slider-area">
+                <input type="range" id="mem-level" min="0" max="3" value="0" oninput="updateMemory()">
+                <div class="memory-labels">
+                    <span>レジスタ</span>
+                    <span>キャッシュ</span>
+                    <span>RAM</span>
+                    <span>HDD/SSD</span>
+                </div>
+            </div>
+            <div class="memory-display">
+                <div class="mem-card">
+                    <div class="mem-name" id="mem-name">レジスタ</div>
+                    <div class="mem-stats">
+                        <div class="mem-row"><span>速度:</span><span id="mem-speed" class="mem-val">★★★★★</span></div>
+                        <div class="mem-row"><span>容量:</span><span id="mem-cap" class="mem-val">数十バイト</span></div>
+                        <div class="mem-row"><span>揮発性:</span><span id="mem-vol" class="mem-val">揮発性</span></div>
+                        <div class="mem-row"><span>場所:</span><span id="mem-loc" class="mem-val">CPU内部</span></div>
+                    </div>
+                </div>
+                <div class="speed-bar">
+                    <div class="speed-fill" id="speed-fill"></div>
+                </div>
+                <p class="speed-label" id="speed-label">超高速！</p>
+            </div>
+            <div class="mission-box">
+                <p class="mission-label">🎯 ミッション</p>
+                <p class="mission-target">4種類すべてのメモリを確認して、速度と容量の「トレードオフ」を体感しよう！</p>
+            </div>
+            <button class="m-btn" id="s3-next" onclick="checkStage3()" disabled>すべて確認して完了 ▶</button>
+        </div>
+
+        <!-- ゲームオーバー -->
+        <div id="screen-gameover" class="screen">
+            <h1 class="gameover-title">BREAKDOWN</h1>
+            <p class="gameover-subtitle" id="gameover-reason">ロボが壊れた…</p>
+            <img src="./computer_anatomy.png" alt="故障" style="width:100px;filter:grayscale(100%) sepia(50%);margin-bottom:20px;border-radius:50%;">
+            <button class="m-btn" onclick="startGame()">↻ 修理して再挑戦</button>
+        </div>
+
+        <!-- クリア -->
+        <div id="screen-clear" class="screen">
+            <img src="./computer_victory.png" alt="完成" style="width:120px;height:120px;object-fit:cover;border-radius:50%;border:2px solid #ff9800;margin-bottom:15px;">
+            <h1 class="clear-title">ASSEMBLY COMPLETE!</h1>
+            <p class="clear-subtitle">五大装置を完全に理解した！</p>
+            <div class="summary-box">
+                <h3>📝 今日の学び</h3>
+                <ul>
+                    <li>五大装置: 入力・出力・記憶・演算・制御</li>
+                    <li>CPU = 演算装置 + 制御装置</li>
+                    <li>レジスタ→キャッシュ→RAM→HDD(速→遅, 小→大)</li>
+                    <li>RAM(主記憶)は電源OFFで消える！</li>
+                </ul>
+            </div>
+            <div class="password-box">
+                <p>🗝️ Google Classroomの解答に以下の「あいことば」を入力してください。</p>
+                <p class="password-text">CPUの気持ちになったら演算が止まらなくなった猫</p>
+            </div>
+            <button class="m-btn" onclick="location.reload()">もう一度整備する</button>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
